@@ -30,18 +30,25 @@ public class Simulador2D extends Application {
         Vehiculo vehiculoPersonal = new Vehiculo(0, 9 * 16);
 
         // Crear vehículos automáticos
-        VehiculoAutomata automata1 = new VehiculoAutomata(78 * 16, 75 * 16, 2, 0, grafo);
-        VehiculoAutomata automata2 = new VehiculoAutomata(49 * 16, 31 * 16, 0, 2, grafo);
-        VehiculoAutomata automata3 = new VehiculoAutomata(20 * 16, 53 * 16, -2, 0, grafo);
-        VehiculoAutomata automata4 = new VehiculoAutomata(0, 97 * 16, 0, -2, grafo);
-        VehiculoAutomata automata5 = new VehiculoAutomata(49 * 16, 9 * 16, 2, 2, grafo);
+        VehiculoAutomata automata1 = new VehiculoAutomata(78 * 16, 75 * 16, 1, 0, grafo);//sin moverse
+        VehiculoAutomata automata2 = new VehiculoAutomata(49 * 16, 31 * 16, 0, 1, grafo);//H
+        VehiculoAutomata automata3 = new VehiculoAutomata(20 * 16, 53 * 16, -1, 0, grafo);//sns
+        VehiculoAutomata automata4 = new VehiculoAutomata(0, 97 * 16, 0, -1, grafo);
+        VehiculoAutomata automata5 = new VehiculoAutomata(49 * 16, 9 * 16, 1, 1, grafo);
 
-        // Asignar rutas a los vehículos automáticos
+        // Asignar rutas válidas a los vehículos automáticos
         automata1.asignarRuta(grafo.generarRutaDFS("R", "C"));
-        automata2.asignarRuta(grafo.generarRutaBFS("H", "T"));
-        automata3.asignarRuta(grafo.generarRutaDFS("K", "A"));
-        automata4.asignarRuta(grafo.generarRutaBFS("T", "E"));
+        automata2.asignarRuta(grafo.generarRutaDFS("H", "T"));
+        automata3.asignarRuta(grafo.generarRutaBFS("K", "A"));//tampoco se mueve
+        automata4.asignarRuta(grafo.generarRutaDFS("T", "E"));
         automata5.asignarRuta(grafo.generarRutaDFS("C", "M"));
+
+        // Crear e iniciar hilos
+        new Thread(automata1).start();
+        new Thread(automata2).start();
+        new Thread(automata3).start();
+        new Thread(automata4).start();
+        new Thread(automata5).start();
 
         // Cargar el mapa
         try {
@@ -61,10 +68,10 @@ public class Simulador2D extends Application {
         // Manejar las teclas para mover el vehículo
         scene.setOnKeyPressed(event -> {
             switch (event.getCode()) {
-                case W -> vehiculoPersonal.mover(0, -5); // UP
-                case A -> vehiculoPersonal.mover(-5, 0); // LEFT
-                case S -> vehiculoPersonal.mover(0, 5);  // DOWN
-                case D -> vehiculoPersonal.mover(5, 0);  // RIGHT
+                case W -> vehiculoPersonal.mover(0, -20); // UP
+                case A -> vehiculoPersonal.mover(-20, 0); // LEFT
+                case S -> vehiculoPersonal.mover(0, 20);  // DOWN
+                case D -> vehiculoPersonal.mover(20, 0);  // RIGHT
             }
 
             // Redibujar el mapa y los vehículos
@@ -201,5 +208,4 @@ public class Simulador2D extends Application {
         // Nodo W
         grafo.agregarCarretera("W", "X");
     }
-
 }

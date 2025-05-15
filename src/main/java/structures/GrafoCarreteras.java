@@ -97,6 +97,61 @@ public class GrafoCarreteras {
 
         return ruta;
     }
+    public List<String> generarRutaDijkstra(String origen, String destino) {
+        Map<String, Double> distancias = new HashMap<>();
+        Map<String, String> predecesores = new HashMap<>();
+        PriorityQueue<String> colaPrioridad = new PriorityQueue<>(Comparator.comparingDouble(distancias::get));
+        Set<String> visitados = new HashSet<>();
+
+        // Inicializar distancias
+        for (String nodo : grafo.keySet()) {
+            distancias.put(nodo, Double.MAX_VALUE);
+        }
+        distancias.put(origen, 0.0);
+        colaPrioridad.add(origen);
+
+        while (!colaPrioridad.isEmpty()) {
+            String actual = colaPrioridad.poll();
+
+            if (!visitados.add(actual)) {
+                continue;
+            }
+
+            if (actual.equals(destino)) {
+                break;
+            }
+
+            for (String vecino : obtenerVecinos(actual)) {
+                if (!visitados.contains(vecino)) {
+                    double[] coordActual = obtenerCoordenadas(actual);
+                    double[] coordVecino = obtenerCoordenadas(vecino);
+                    double distancia = Math.sqrt(Math.pow(coordVecino[0] - coordActual[0], 2) + Math.pow(coordVecino[1] - coordActual[1], 2));
+
+                    double nuevaDistancia = distancias.get(actual) + distancia;
+                    if (nuevaDistancia < distancias.get(vecino)) {
+                        distancias.put(vecino, nuevaDistancia);
+                        predecesores.put(vecino, actual);
+                        colaPrioridad.add(vecino);
+                    }
+                }
+            }
+        }
+
+        // Reconstruir la ruta
+        List<String> ruta = new LinkedList<>();
+        String paso = destino;
+        while (paso != null && predecesores.containsKey(paso)) {
+            ruta.add(0, paso);
+            paso = predecesores.get(paso);
+        }
+
+        if (!ruta.isEmpty() && ruta.get(0).equals(origen)) {
+            ruta.add(0, origen);
+        }
+
+        return ruta;
+    }
+
 
 
 

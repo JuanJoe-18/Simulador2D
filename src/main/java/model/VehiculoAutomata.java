@@ -1,36 +1,31 @@
 package model;
+
 import javafx.scene.canvas.GraphicsContext;
 import structures.GrafoCarreteras;
 
-import java.util.*;
+import java.util.LinkedList;
+import java.util.List;
 
-public class VehiculoAutomata extends Vehiculo{
+public class VehiculoAutomata extends Vehiculo implements Runnable {
     private double velocidadX;
     private double velocidadY;
     private LinkedList<String> ruta;
-
+    private boolean activo = true;
     private GrafoCarreteras grafo;
-    public VehiculoAutomata(double x, double y, double velocidadX, double velocidadY) {
+
+    public VehiculoAutomata(double x, double y, double velocidadX, double velocidadY, GrafoCarreteras grafo) {
         super(x, y);
         this.velocidadX = velocidadX;
         this.velocidadY = velocidadY;
-        this.ruta = new LinkedList();
+        this.ruta = new LinkedList<>();
+        this.grafo = grafo;
     }
 
-    /*
-    * last logica: mover(velocidadX,velocidadY);
-        //cambiar de direccion si se llega al borde del mapa
-        if(getX() <= 0 || getX()>= 1600 - getWidth()){
-            velocidadX = -velocidadX;
-        }
-        if (getY() <= 0 || getY() >= 1600 - getHeight()) {
-            velocidadY = -velocidadY;
-        }*/
-
-    public void moverAutomata(){
-        if (!ruta.isEmpty()){
+    public void moverAutomata() {
+        if (ruta != null && !ruta.isEmpty()) {
             String nodoActual = ruta.peek();
             double[] destino = obtenerCoordenadasNodo(nodoActual);
+
             // Calcular dirección hacia el nodo destino
             double dx = destino[0] - getX();
             double dy = destino[1] - getY();
@@ -45,31 +40,38 @@ public class VehiculoAutomata extends Vehiculo{
                 // Moverse hacia el nodo destino
                 mover((dx / distancia) * velocidadX, (dy / distancia) * velocidadY);
             }
-
         }
+    }
 
+    @Override
+    public void run() {
+        while (activo) {
+            moverAutomata();
+            try {
+                Thread.sleep(50); // Controla la velocidad de movimiento
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                break;
+            }
+        }
+    }
+
+    public void detener() {
+        activo = false;
+    }
+
+    public void asignarRuta(List<String> ruta) {
+        if (ruta != null) {
+            this.ruta = new LinkedList<>(ruta);
+        }
+    }
+
+    private double[] obtenerCoordenadasNodo(String nodo) {
+        return grafo.obtenerCoordenadas(nodo);
     }
 
     @Override
     public void dibujar(GraphicsContext gc) {
         super.dibujar(gc);
-    }
-
-    public void asignarRuta(List<String> ruta) {
-        this.ruta = new LinkedList<>(ruta);
-    }
-
-
-
-    public VehiculoAutomata(double x, double y, double velocidadX, double velocidadY, GrafoCarreteras grafo) {
-        super(x, y);
-        this.velocidadX = velocidadX;
-        this.velocidadY = velocidadY;
-        this.ruta = new LinkedList<>();
-        this.grafo = grafo;
-    }
-
-    private double[] obtenerCoordenadasNodo(String nodo) {
-        return grafo.obtenerCoordenadas(nodo);
     }
 }
