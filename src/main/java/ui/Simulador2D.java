@@ -12,8 +12,8 @@ import model.Vehiculo;
 import model.VehiculoAutomata;
 
 public class Simulador2D extends Application {
-    private static final int WIDTH = 1600;
-    private static final int HEIGHT = 1600;
+    private static final int WIDTH = 16*400;
+    private static final int HEIGHT = 16*400;
     private Image mapa;
 
     @Override
@@ -27,21 +27,21 @@ public class Simulador2D extends Application {
         inicializarGrafo(grafo);
 
         // Crear el carro controlado por el usuario
-        Vehiculo vehiculoPersonal = new Vehiculo(0, 9 * 16);
+        Vehiculo vehiculoPersonal = new Vehiculo(46, 75 * 16);
 
         // Crear vehículos automáticos
-        VehiculoAutomata automata1 = new VehiculoAutomata(78 * 16, 75 * 16, 1, 0, grafo);//sin moverse
-        VehiculoAutomata automata2 = new VehiculoAutomata(49 * 16, 31 * 16, 0, 1, grafo);//H
-        VehiculoAutomata automata3 = new VehiculoAutomata(20 * 16, 53 * 16, -1, 0, grafo);//sns
-        VehiculoAutomata automata4 = new VehiculoAutomata(0, 97 * 16, 0, -1, grafo);
-        VehiculoAutomata automata5 = new VehiculoAutomata(49 * 16, 9 * 16, 1, 1, grafo);
+        VehiculoAutomata automata1 = new VehiculoAutomata(209 * 16, 186 * 16, 1, 0, grafo); // Nodo "R"
+        VehiculoAutomata automata2 = new VehiculoAutomata(180 * 16, 142 * 16, 0, 1, grafo); // Nodo "H"
+        VehiculoAutomata automata3 = new VehiculoAutomata(151 * 16, 164 * 16, -1, 0, grafo); // Nodo "K"
+        VehiculoAutomata automata4 = new VehiculoAutomata(131 * 16, 208 * 16, 0, -1, grafo); // Nodo "T"
+        VehiculoAutomata automata5 = new VehiculoAutomata(180 * 16, 120 * 16, 1, 1, grafo); // Nodo "C"
 
         // Asignar rutas válidas a los vehículos automáticos
-        automata1.asignarRuta(grafo.generarRutaDFS("R", "C"));
-        automata2.asignarRuta(grafo.generarRutaDFS("H", "T"));
-        automata3.asignarRuta(grafo.generarRutaBFS("K", "A"));//tampoco se mueve
-        automata4.asignarRuta(grafo.generarRutaDFS("T", "E"));
-        automata5.asignarRuta(grafo.generarRutaDFS("C", "M"));
+        automata1.asignarRuta(grafo.generarRutaDFS("R", "F"));
+        automata2.asignarRuta(grafo.generarRutaDFS("H", "X"));
+        automata3.asignarRuta(grafo.generarRutaBFS("K", "O"));//tampoco se mueve
+        automata4.asignarRuta(grafo.generarRutaDFS("G", "E"));
+        automata5.asignarRuta(grafo.generarRutaDFS("C", "T"));
 
         // Crear e iniciar hilos
         new Thread(automata1).start();
@@ -52,7 +52,7 @@ public class Simulador2D extends Application {
 
         // Cargar el mapa
         try {
-            mapa = new Image(getClass().getResource("/assets/MAPA.png").toExternalForm());
+            mapa = new Image(getClass().getResource("/assets/MAPA2png.png").toExternalForm());
             System.out.println("Imagen cargada correctamente.");
         } catch (Exception e) {
             System.err.println("Error al cargar la imagen: " + e.getMessage());
@@ -127,36 +127,42 @@ public class Simulador2D extends Application {
     }
 
     public static void inicializarGrafo(GrafoCarreteras grafo) {
-        grafo.agregarInterseccion("A", 0, 9 * 16);
-        grafo.agregarInterseccion("B", 20 * 16, 9 * 16);
-        grafo.agregarInterseccion("C", 49 * 16, 9 * 16);
-        grafo.agregarInterseccion("D", 78 * 16, 9 * 16);
-        grafo.agregarInterseccion("E", 99 * 16, 9 * 16);
+        grafo.agregarInterseccion("Inicio",46*16,75*16);
+        grafo.agregarInterseccion("A_0",46*16,120*16);
+        grafo.agregarInterseccion("A", 131*16, 120 * 16);
+        grafo.agregarInterseccion("B", 151 * 16, 120 * 16);
+        grafo.agregarInterseccion("C", 180 * 16, 120 * 16);
+        grafo.agregarInterseccion("D", 209 * 16, 120 * 16);
+        grafo.agregarInterseccion("E", 230 * 16, 120 * 16); //🆗
 
-        grafo.agregarInterseccion("F", 0, 31 * 16);
-        grafo.agregarInterseccion("G", 20 * 16, 31 * 16);
-        grafo.agregarInterseccion("H", 49 * 16, 31 * 16);
-        grafo.agregarInterseccion("I", 78 * 16, 31 * 16);
-        grafo.agregarInterseccion("J", 99 * 16, 31 * 16);
+        grafo.agregarInterseccion("F", 131, 142 * 16);
+        grafo.agregarInterseccion("G", 151 * 16, 142 * 16);
+        grafo.agregarInterseccion("H", 180 * 16, 142 * 16);
+        grafo.agregarInterseccion("I", 209 * 16, 142 * 16);
+        grafo.agregarInterseccion("J", 230 * 16, 142 * 16);//🆗
 
-        grafo.agregarInterseccion("K", 20 * 16, 53 * 16);
-        grafo.agregarInterseccion("L", 49 * 16, 53 * 16);
-        grafo.agregarInterseccion("M", 78 * 16, 53 * 16);
-        grafo.agregarInterseccion("N", 99 * 16, 53 * 16);
+        grafo.agregarInterseccion("K", 151 * 16, 164 * 16);
+        grafo.agregarInterseccion("L", 180 * 16, 164 * 16);
+        grafo.agregarInterseccion("M", 209 * 16, 164 * 16);
+        grafo.agregarInterseccion("N", 230 * 16, 164 * 16);//🆗
 
-        grafo.agregarInterseccion("O", 0, 75 * 16);
-        grafo.agregarInterseccion("P", 20 * 16, 75 * 16);
-        grafo.agregarInterseccion("Q", 49 * 16, 75 * 16);
-        grafo.agregarInterseccion("R", 78 * 16, 75 * 16);
-        grafo.agregarInterseccion("S", 99 * 16, 75 * 16);
+        grafo.agregarInterseccion("O", 131, 186 * 16);
+        grafo.agregarInterseccion("P", 151 * 16, 186 * 16);
+        grafo.agregarInterseccion("Q", 180 * 16, 186 * 16);
+        grafo.agregarInterseccion("R", 209 * 16, 186 * 16);
+        grafo.agregarInterseccion("S", 230 * 16, 186 * 16);
 
-        grafo.agregarInterseccion("T", 0, 97 * 16);
-        grafo.agregarInterseccion("U", 20 * 16, 97 * 16);
-        grafo.agregarInterseccion("V", 49 * 16, 97 * 16);
-        grafo.agregarInterseccion("W", 78 * 16, 97 * 16);
-        grafo.agregarInterseccion("X", 99 * 16, 97 * 16);
+        grafo.agregarInterseccion("T", 131, 208 * 16);
+        grafo.agregarInterseccion("U", 151 * 16, 208 * 16);
+        grafo.agregarInterseccion("V", 180 * 16, 208 * 16);
+        grafo.agregarInterseccion("W", 209 * 16, 208 * 16);
+        grafo.agregarInterseccion("X", 230 * 16, 208 * 16);
 
         // Lista de adyacencias sin duplicados .>Ojo porque hacer esto manualmente es demasiado tedioso
+        //Nodo Inicio
+        grafo.agregarCarretera("Inicio","A_0");
+        //Nodo puente
+        grafo.agregarCarretera("A_0","A");
         // Nodo A
         grafo.agregarCarretera("A", "B");
         // Nodo B
