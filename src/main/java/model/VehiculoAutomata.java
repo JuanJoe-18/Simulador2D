@@ -48,7 +48,7 @@ public class VehiculoAutomata extends Vehiculo implements Runnable {
         while (activo) {
             moverAutomata();
             try {
-                Thread.sleep(50); // Controla la velocidad de movimiento
+                Thread.sleep(25); // Controla la velocidad de movimiento
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 break;
@@ -56,9 +56,7 @@ public class VehiculoAutomata extends Vehiculo implements Runnable {
         }
     }
 
-    public void detener() {
-        activo = false;
-    }
+
 
     public void asignarRuta(List<String> ruta) {
         if (ruta != null) {
