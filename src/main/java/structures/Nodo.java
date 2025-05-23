@@ -1,21 +1,21 @@
 package structures;
 
-public class Nodo {
-    private String nombre;
+public class Nodo<T> {
+    private T nombre;
     private double x;
     private double y;
 
-    public Nodo(String nombre, double x, double y) {
+    public Nodo(T nombre, double x, double y) {
         this.nombre = nombre;
         this.x = x;
         this.y = y;
     }
 
-    public String getNombre() {
+    public T getNombre() {
         return nombre;
     }
 
-    public void setNombre(String nombre) {
+    public void setNombre(T nombre) {
         this.nombre = nombre;
     }
 

@@ -74,6 +74,10 @@ public class Vehiculo {
                this.y + this.height > otro.y;
     }
 
+    public void detener() {
+        System.out.println("Vehículo detenido.");
+    }
+
     public double getX() {
         return x;
     }
@@ -95,4 +99,5 @@ public class Vehiculo {
     public void setY(double y) {
         this.y = y;
     }
+
 }

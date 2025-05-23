@@ -9,10 +9,10 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.stage.Stage;
-import structures.GrafoCarreteras;
+import structures.Grafo;
+import structures.GrafoUtils;
 import javafx.scene.image.Image;
 import model.Vehiculo;
-import model.VehiculoAutomata;
 
 public class Simulador2D extends Application {
     private static final int WIDTH = 16 * 400;
@@ -20,20 +20,16 @@ public class Simulador2D extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        // Crear el canvas y el contexto gráfico
         Canvas canvas = new Canvas(WIDTH, HEIGHT);
         GraphicsContext gc = canvas.getGraphicsContext2D();
 
         Group root = new Group(canvas);
-        Scene scene = new Scene(root,800,600);
+        Scene scene = new Scene(root, 800, 600);
 
+        Grafo<String> grafo = new Grafo<>();
+        GrafoUtils.inicializarGrafo(grafo);
 
-        // Crear el grafo de carreteras
-        GrafoCarreteras grafo = new GrafoCarreteras();
-        GrafoCarreteras.inicializarGrafo(grafo);
-
-        // Crear el carro controlado por el usuario
-        Vehiculo vehiculoPersonal = new Vehiculo(180*16, 142 * 16);
+        Vehiculo vehiculoPersonal = new Vehiculo(180 * 16, 142 * 16);
         JugadorController jugadorController = new JugadorController(vehiculoPersonal);
 
         VehiculoAutomataController automataController = new VehiculoAutomataController(grafo, gc, WIDTH, HEIGHT);
@@ -73,13 +69,7 @@ public class Simulador2D extends Application {
         }
     }
 
-    private void drawMap(GraphicsContext gc, Image mapa) {
-        // Dibujar el mapa como fondo
-        gc.drawImage(mapa, 0, 0, WIDTH, HEIGHT);
-    }
-
     private void actualizarCamara(Group root, Scene scene, Vehiculo vehiculo) {
-        // Calcular el desplazamiento de la cámara
         double offsetX = Math.min(0, Math.max(scene.getWidth() / 2 - vehiculo.getX(), -WIDTH + scene.getWidth()));
         double offsetY = Math.min(0, Math.max(scene.getHeight() / 2 - vehiculo.getY(), -HEIGHT + scene.getHeight()));
         root.setTranslateX(offsetX);
@@ -89,5 +79,4 @@ public class Simulador2D extends Application {
     public static void main(String[] args) {
         launch(args);
     }
-
 }
