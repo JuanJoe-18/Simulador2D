@@ -3,80 +3,93 @@ package structures;
 import java.util.*;
 
 public class GrafoCarreteras {
-    private final Map<String, List<String>> grafo;
-    private final Map<String, double[]> coordenadas; // Coordenadas de cada nodo
-
+    private final Map<Nodo, List<Arista>> grafo;
+    private final Map<String, Nodo> nodosPorNombre;
 
     public GrafoCarreteras() {
         this.grafo = new HashMap<>();
-        this.coordenadas = new HashMap<>();
+        this.nodosPorNombre = new HashMap<>();
     }
 
-    public void agregarInterseccion(String nodo, double x, double y) {
+    public void agregarInterseccion(String nombre, double x, double y) {
+        Nodo nodo = new Nodo(nombre, x, y);
         grafo.putIfAbsent(nodo, new ArrayList<>());
-        coordenadas.put(nodo, new double[]{x, y});
+        nodosPorNombre.put(nombre, nodo);
     }
 
-    public void agregarCarretera(String origen, String destino) {
-        grafo.putIfAbsent(origen, new ArrayList<>());
-        grafo.putIfAbsent(destino, new ArrayList<>());
-        grafo.get(origen).add(destino);
-        grafo.get(destino).add(origen); // Doble sentido
+    public void agregarCarretera(String nombreOrigen, String nombreDestino) {
+        Nodo origen = nodosPorNombre.get(nombreOrigen);
+        Nodo destino = nodosPorNombre.get(nombreDestino);
+        if (origen == null || destino == null) return;
+        double distancia = calcularDistancia(origen, destino);
+        grafo.get(origen).add(new Arista(origen, destino, distancia));
+        grafo.get(destino).add(new Arista(destino, origen, distancia)); // Doble sentido
     }
 
-    public List<String> obtenerVecinos(String nodo) {
-        return grafo.getOrDefault(nodo, Collections.emptyList());
+    public List<Nodo> obtenerVecinos(Nodo nodo) {
+        List<Nodo> vecinos = new ArrayList<>();
+        for (Arista arista : grafo.getOrDefault(nodo, Collections.emptyList())) {
+            vecinos.add(arista.getDestino());
+        }
+        return vecinos;
     }
 
-    public double[] obtenerCoordenadas(String nodo) {
-        return coordenadas.get(nodo);
+    public Nodo obtenerNodoPorNombre(String nombre) {
+        return nodosPorNombre.get(nombre);
     }
 
-    public List<String> generarRutaDFS(String origen, String destino) {
-        List<String> ruta = new ArrayList<>();
-        Set<String> visitados = new HashSet<>();
+    public double[] obtenerCoordenadas(Nodo nodo) {
+        if (nodo == null) return null;
+        return new double[]{nodo.getX(), nodo.getY()};
+    }
+
+    public List<Nodo> obtenerNodos() {
+        return new ArrayList<>(nodosPorNombre.values());
+    }
+
+    public List<Nodo> generarRutaDFS(String nombreOrigen, String nombreDestino) {
+        Nodo origen = obtenerNodoPorNombre(nombreOrigen);
+        Nodo destino = obtenerNodoPorNombre(nombreDestino);
+        List<Nodo> ruta = new ArrayList<>();
+        Set<Nodo> visitados = new HashSet<>();
         if (dfs(origen, destino, visitados, ruta)) {
             return ruta;
         }
-        return Collections.emptyList(); // No se encontró ruta
+        return Collections.emptyList();
     }
 
-    private boolean dfs(String actual, String destino, Set<String> visitados, List<String> ruta) {
+    private boolean dfs(Nodo actual, Nodo destino, Set<Nodo> visitados, List<Nodo> ruta) {
+        if (actual == null) return false;
         visitados.add(actual);
         ruta.add(actual);
-
         if (actual.equals(destino)) {
             return true;
         }
-
-        for (String vecino : obtenerVecinos(actual)) {
+        for (Nodo vecino : obtenerVecinos(actual)) {
             if (!visitados.contains(vecino)) {
                 if (dfs(vecino, destino, visitados, ruta)) {
                     return true;
                 }
             }
         }
-
         ruta.remove(ruta.size() - 1);
         return false;
     }
 
-    public List<String> generarRutaBFS(String origen, String destino) {
-        Map<String, String> predecesores = new HashMap<>();
-        Queue<String> cola = new LinkedList<>();
-        Set<String> visitados = new HashSet<>();
-
+    public List<Nodo> generarRutaBFS(String nombreOrigen, String nombreDestino) {
+        Nodo origen = obtenerNodoPorNombre(nombreOrigen);
+        Nodo destino = obtenerNodoPorNombre(nombreDestino);
+        Map<Nodo, Nodo> predecesores = new HashMap<>();
+        Queue<Nodo> cola = new LinkedList<>();
+        Set<Nodo> visitados = new HashSet<>();
         cola.add(origen);
         visitados.add(origen);
-
         while (!cola.isEmpty()) {
-            String actual = cola.poll();
-
+            Nodo actual = cola.poll();
             if (actual.equals(destino)) {
                 break;
             }
-
-            for (String vecino : obtenerVecinos(actual)) {
+            for (Nodo vecino : obtenerVecinos(actual)) {
                 if (!visitados.contains(vecino)) {
                     visitados.add(vecino);
                     predecesores.put(vecino, actual);
@@ -84,52 +97,42 @@ public class GrafoCarreteras {
                 }
             }
         }
-
-        List<String> ruta = new LinkedList<>();
-        String paso = destino;
+        List<Nodo> ruta = new LinkedList<>();
+        Nodo paso = destino;
         while (paso != null && predecesores.containsKey(paso)) {
             ruta.add(0, paso);
             paso = predecesores.get(paso);
         }
-
         if (!ruta.isEmpty() && ruta.get(0).equals(origen)) {
             ruta.add(0, origen);
         }
-
         return ruta;
     }
 
-    public List<String> generarRutaDijkstra(String origen, String destino) {
-        Map<String, Double> distancias = new HashMap<>();
-        Map<String, String> predecesores = new HashMap<>();
-        PriorityQueue<String> colaPrioridad = new PriorityQueue<>(Comparator.comparingDouble(distancias::get));
-        Set<String> visitados = new HashSet<>();
-
-        // Inicializar distancias
-        for (String nodo : grafo.keySet()) {
+    public List<Nodo> generarRutaDijkstra(String nombreOrigen, String nombreDestino) {
+        Nodo origen = obtenerNodoPorNombre(nombreOrigen);
+        Nodo destino = obtenerNodoPorNombre(nombreDestino);
+        Map<Nodo, Double> distancias = new HashMap<>();
+        Map<Nodo, Nodo> predecesores = new HashMap<>();
+        PriorityQueue<Nodo> colaPrioridad = new PriorityQueue<>(Comparator.comparingDouble(distancias::get));
+        Set<Nodo> visitados = new HashSet<>();
+        for (Nodo nodo : grafo.keySet()) {
             distancias.put(nodo, Double.MAX_VALUE);
         }
         distancias.put(origen, 0.0);
         colaPrioridad.add(origen);
-
         while (!colaPrioridad.isEmpty()) {
-            String actual = colaPrioridad.poll();
-
+            Nodo actual = colaPrioridad.poll();
             if (!visitados.add(actual)) {
                 continue;
             }
-
             if (actual.equals(destino)) {
                 break;
             }
-
-            for (String vecino : obtenerVecinos(actual)) {
+            for (Arista arista : grafo.getOrDefault(actual, Collections.emptyList())) {
+                Nodo vecino = arista.getDestino();
                 if (!visitados.contains(vecino)) {
-                    double[] coordActual = obtenerCoordenadas(actual);
-                    double[] coordVecino = obtenerCoordenadas(vecino);
-                    double distancia = Math.sqrt(Math.pow(coordVecino[0] - coordActual[0], 2) + Math.pow(coordVecino[1] - coordActual[1], 2));
-
-                    double nuevaDistancia = distancias.get(actual) + distancia;
+                    double nuevaDistancia = distancias.get(actual) + arista.getDistancia();
                     if (nuevaDistancia < distancias.get(vecino)) {
                         distancias.put(vecino, nuevaDistancia);
                         predecesores.put(vecino, actual);
@@ -138,20 +141,22 @@ public class GrafoCarreteras {
                 }
             }
         }
-
-        // Reconstruir la ruta
-        List<String> ruta = new LinkedList<>();
-        String paso = destino;
+        List<Nodo> ruta = new LinkedList<>();
+        Nodo paso = destino;
         while (paso != null && predecesores.containsKey(paso)) {
             ruta.add(0, paso);
             paso = predecesores.get(paso);
         }
-
         if (!ruta.isEmpty() && ruta.get(0).equals(origen)) {
             ruta.add(0, origen);
         }
-
         return ruta;
+    }
+
+    private double calcularDistancia(Nodo a, Nodo b) {
+        double dx = a.getX() - b.getX();
+        double dy = a.getY() - b.getY();
+        return Math.sqrt(dx * dx + dy * dy);
     }
 
     public static void inicializarGrafo(GrafoCarreteras grafo) {
@@ -161,18 +166,18 @@ public class GrafoCarreteras {
         grafo.agregarInterseccion("B", 151 * 16, 120 * 16);
         grafo.agregarInterseccion("C", 180 * 16, 120 * 16);
         grafo.agregarInterseccion("D", 209 * 16, 120 * 16);
-        grafo.agregarInterseccion("E", 230 * 16, 120 * 16); //🆗
+        grafo.agregarInterseccion("E", 230 * 16, 120 * 16);
 
         grafo.agregarInterseccion("F", 131 * 16, 142 * 16);
         grafo.agregarInterseccion("G", 151 * 16, 142 * 16);
         grafo.agregarInterseccion("H", 180 * 16, 142 * 16);
         grafo.agregarInterseccion("I", 209 * 16, 142 * 16);
-        grafo.agregarInterseccion("J", 230 * 16, 142 * 16);//🆗
+        grafo.agregarInterseccion("J", 230 * 16, 142 * 16);
 
         grafo.agregarInterseccion("K", 151 * 16, 164 * 16);
         grafo.agregarInterseccion("L", 180 * 16, 164 * 16);
         grafo.agregarInterseccion("M", 209 * 16, 164 * 16);
-        grafo.agregarInterseccion("N", 230 * 16, 164 * 16);//🆗
+        grafo.agregarInterseccion("N", 230 * 16, 164 * 16);
 
         grafo.agregarInterseccion("O", 131 * 16, 186 * 16);
         grafo.agregarInterseccion("P", 151 * 16, 186 * 16);
@@ -180,65 +185,43 @@ public class GrafoCarreteras {
         grafo.agregarInterseccion("R", 209 * 16, 186 * 16);
         grafo.agregarInterseccion("S", 230 * 16, 186 * 16);
 
-       //en el nuevo mapa el noddo T ha desaperecido
         grafo.agregarInterseccion("U", 151 * 16, 208 * 16);
         grafo.agregarInterseccion("V", 180 * 16, 208 * 16);
         grafo.agregarInterseccion("W", 209 * 16, 208 * 16);
         grafo.agregarInterseccion("X", 230 * 16, 208 * 16);
 
-        // Lista de adyacencias sin duplicados .>Ojo porque hacer esto manualmente es demasiado tedioso
-        //Nodo Inicio
         grafo.agregarCarretera("Inicio", "A_0");
-        //Nodo puente
         grafo.agregarCarretera("A_0", "A");
-        // Nodo A
         grafo.agregarCarretera("A", "B");
-        // Nodo B
         grafo.agregarCarretera("B", "C");
         grafo.agregarCarretera("B", "G");
-        // Nodo C
         grafo.agregarCarretera("C", "D");
         grafo.agregarCarretera("C", "H");
-        // Nodo D
         grafo.agregarCarretera("D", "E");
         grafo.agregarCarretera("D", "I");
-        // Nodo F
         grafo.agregarCarretera("F", "G");
-        // Nodo G
         grafo.agregarCarretera("G", "H");
         grafo.agregarCarretera("G", "K");
-        // Nodo H
         grafo.agregarCarretera("H", "I");
         grafo.agregarCarretera("H", "L");
-        // Nodo I
         grafo.agregarCarretera("I", "J");
         grafo.agregarCarretera("I", "M");
-        // Nodo K
         grafo.agregarCarretera("K", "L");
         grafo.agregarCarretera("K", "P");
-        // Nodo L
         grafo.agregarCarretera("L", "M");
         grafo.agregarCarretera("L", "Q");
-        // Nodo M
         grafo.agregarCarretera("M", "N");
         grafo.agregarCarretera("M", "R");
-        // Nodo O
         grafo.agregarCarretera("O", "P");
-        // Nodo P
         grafo.agregarCarretera("P", "Q");
         grafo.agregarCarretera("P", "U");
-        // Nodo Q
         grafo.agregarCarretera("Q", "R");
         grafo.agregarCarretera("Q", "V");
-        // Nodo R
         grafo.agregarCarretera("R", "S");
         grafo.agregarCarretera("R", "W");
-        // Nodo U
         grafo.agregarCarretera("U", "V");
-        // Nodo V
         grafo.agregarCarretera("V", "W");
-        // Nodo W
         grafo.agregarCarretera("W", "X");
-
     }
 }
+

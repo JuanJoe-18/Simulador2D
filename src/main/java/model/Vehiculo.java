@@ -3,7 +3,7 @@ package model;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.image.Image;
 
-public class Vehiculo {
+public class Vehiculo implements Renderizable {
     private double x;
     private double y;
     private double width;

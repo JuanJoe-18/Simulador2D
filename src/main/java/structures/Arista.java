@@ -1,29 +1,29 @@
 package structures;
 
 public class Arista {
-    private String origen;
-    private String destino;
+    private Nodo origen;
+    private Nodo destino;
     private double distancia;
 
-    public Arista(String origen, String destino, double distancia) {
+    public Arista(Nodo origen, Nodo destino, double distancia) {
         this.origen = origen;
         this.destino = destino;
         this.distancia = distancia;
     }
 
-    public String getOrigen() {
+    public Nodo getOrigen() {
         return origen;
     }
 
-    public void setOrigen(String origen) {
+    public void setOrigen(Nodo origen) {
         this.origen = origen;
     }
 
-    public String getDestino() {
+    public Nodo getDestino() {
         return destino;
     }
 
-    public void setDestino(String destino) {
+    public void setDestino(Nodo destino) {
         this.destino = destino;
     }
 
