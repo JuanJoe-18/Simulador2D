@@ -26,28 +26,30 @@ public class VehiculoAutomataController {
     }
 
     public void inicializarAutomatas() {
-        VehiculoAutomata automata1 = new VehiculoAutomata(131 * 16, 120 * 16, 0.333, 0.333, grafo);
-        VehiculoAutomata automata2 = new VehiculoAutomata(180 * 16, 142 * 16, 0.333, 0.333, grafo);
-        VehiculoAutomata automata3 = new VehiculoAutomata(151 * 16, 164 * 16, 0.333, 0.333, grafo);
-        VehiculoAutomata automata4 = new VehiculoAutomata(131 * 16, 208 * 16, 0.333, 0.333, grafo);
-        VehiculoAutomata automata5 = new VehiculoAutomata(180 * 16, 120 * 16, 0.333, 0.333, grafo);
-        VehiculoAutomata automata6 = new VehiculoAutomata(209 * 16, 120 * 16, 0.333, 0.333, grafo);
-        VehiculoAutomata automata7 = new VehiculoAutomata(230 * 16, 142 * 16, 0.333, 0.333, grafo);
-        VehiculoAutomata automata8 = new VehiculoAutomata(151 * 16, 186 * 16, 0.333, 0.333, grafo);
-        VehiculoAutomata automata9 = new VehiculoAutomata(209 * 16, 208 * 16, 0.333, 0.333, grafo);
-        VehiculoAutomata automata10 = new VehiculoAutomata(230 * 16, 208 * 16, 0.333, 0.333, grafo);
+        // Spawns y rutas usando los nuevos nodos del grafo dirigido
+        VehiculoAutomata automata1 = new VehiculoAutomata(720.0, 1210.0, 0.333, 0.333, grafo); // A1
+        VehiculoAutomata automata2 = new VehiculoAutomata(2405.0, 1910.0, 0.333, 0.333, grafo); // C1
+        VehiculoAutomata automata3 = new VehiculoAutomata(2865.0, 1910.0, 0.333, 0.333, grafo); // D1
+        VehiculoAutomata automata4 = new VehiculoAutomata(3330.0, 1910.0, 0.333, 0.333, grafo); // E1
+        VehiculoAutomata automata5 = new VehiculoAutomata(3690.0, 1910.0, 0.333, 0.333, grafo); // F1
+        VehiculoAutomata automata6 = new VehiculoAutomata(2405.0, 2260.0, 0.333, 0.333, grafo); // H1
+        VehiculoAutomata automata7 = new VehiculoAutomata(2865.0, 2260.0, 0.333, 0.333, grafo); // I1
+        VehiculoAutomata automata8 = new VehiculoAutomata(3330.0, 2260.0, 0.333, 0.333, grafo); // J1
+        VehiculoAutomata automata9 = new VehiculoAutomata(3690.0, 2260.0, 0.333, 0.333, grafo); // K1
+        VehiculoAutomata automata10 = new VehiculoAutomata(2405.0, 2610.0, 0.333, 0.333, grafo); // L1
 
-        automata1.asignarRuta(grafo.generarRutaDFS("A", "N"));
-        automata2.asignarRuta(grafo.generarRutaDFS("H", "X"));
-        automata3.asignarRuta(grafo.generarRutaDFS("K", "O"));
-        automata4.asignarRuta(grafo.generarRutaDFS("G", "E"));
-        automata5.asignarRuta(grafo.generarRutaDFS("C", "H"));
-        automata6.asignarRuta(grafo.generarRutaDFS("D", "S"));
-        automata7.asignarRuta(grafo.generarRutaDFS("J", "O"));
-        automata8.asignarRuta(grafo.generarRutaDFS("P", "A_0"));
-        automata9.asignarRuta(grafo.generarRutaDFS("W", "B"));
-        automata10.asignarRuta(grafo.generarRutaDFS("X", "F"));
+        automata1.asignarRuta(grafo.generarRutaDFS("A1", "O2"));
+        automata2.asignarRuta(grafo.generarRutaDFS("C1", "X2"));
+        automata3.asignarRuta(grafo.generarRutaDFS("D1", "T2"));
+        automata4.asignarRuta(grafo.generarRutaDFS("E1", "P2"));
+        automata5.asignarRuta(grafo.generarRutaDFS("F1", "A2"));
+        automata6.asignarRuta(grafo.generarRutaDFS("H1", "L4"));
+        automata7.asignarRuta(grafo.generarRutaDFS("I1", "V4"));
+        automata8.asignarRuta(grafo.generarRutaDFS("J1", "W4"));
+        automata9.asignarRuta(grafo.generarRutaDFS("K1", "X1"));
+        automata10.asignarRuta(grafo.generarRutaDFS("L1", "U4"));
 
+        automatas.clear();
         automatas.add(automata1);
         automatas.add(automata2);
         automatas.add(automata3);
@@ -59,10 +61,10 @@ public class VehiculoAutomataController {
         automatas.add(automata9);
         automatas.add(automata10);
 
-        // Creamos la piscinita de hilos un p de hilos pero fija
+        if (pool != null) pool.shutdownNow();
         pool = Executors.newFixedThreadPool(automatas.size());
         for (VehiculoAutomata automata : automatas) {
-            pool.submit(automata);
+            pool.execute(automata);
         }
     }
 

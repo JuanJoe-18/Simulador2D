@@ -33,7 +33,7 @@ public class GameController {
         this.root = root;
         this.scene = scene;
         this.grafo = new GrafoCarreteras();
-        GrafoCarreteras.inicializarGrafo(grafo);
+        this.grafo.initializeMapPaths(); // Usar el nuevo grafo dirigido
         this.jugador = new Vehiculo(180 * 16, 142 * 16);
         this.jugadorController = new JugadorController(jugador);
         this.automataController = new VehiculoAutomataController(grafo, gc, width, height);
